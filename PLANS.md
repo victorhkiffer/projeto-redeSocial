@@ -91,7 +91,7 @@ Modo Claro
 
 Modo Escuro
 - Fundo: #0F172A
-- Verde: #22C55E
+- Verde: #197e3e
 - Branco: #F8FAFC
 - Cinza: #94A3B8
 
