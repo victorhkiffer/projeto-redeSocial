@@ -16,6 +16,7 @@ Objetivos do produto:
 - Conectar empresas para prestação de serviços
 - Facilitar comunicação e negociação entre empresas
 - Criar um sistema de reputação baseado em avaliações reais
+- Empresa que avalia constantemente serviços que foram prestados a ela ou tenham sido bem avaliadas sobem no ranking de recomendação quando uma pessoa pesquisa por determinado serviço
 - Incentivar empresas ativas e bem avaliadas
 - Permitir divulgação de serviços via postagens
 
