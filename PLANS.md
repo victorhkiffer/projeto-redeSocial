@@ -81,6 +81,20 @@ Restrições:
 - Serviços ou Solicitações
 - Avaliações (Ranking)
 
+### Paleta de Cores
+Modo Claro
+- Primária: #22C55E
+- Hover/destaque: #16A34A
+- Fundo: #F8FAFC
+- Texto: #0F172A
+- Cinza secundário: #64748B
+
+Modo Escuro
+- Fundo: #0F172A
+- Verde: #22C55E
+- Branco: #F8FAFC
+- Cinza: #94A3B8
+
 ## Plan of Work
 Backlog estruturado por frentes de trabalho. Detalhe suficiente para execução contínua, sem virar documentação de arquitetura.
 
