@@ -87,7 +87,7 @@ Modo Claro
 - Hover/destaque: #16A34A
 - Fundo: #F8FAFC
 - Texto: #0F172A
-- Cinza secundário: #64748B
+- Cinza secundário: #5e6c80
 
 Modo Escuro
 - Fundo: #0F172A
