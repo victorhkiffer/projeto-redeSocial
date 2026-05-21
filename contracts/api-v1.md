@@ -18,6 +18,10 @@ Objetivo: alinhar entidades/fluxos antes da implementação. Campos finais podem
 - `POST /companies/:id/representatives` (convidar/cadastrar)
 - `POST /representatives/:id/approve`
 - `POST /representatives/:id/reject`
+- `POST /representatives/:id/disable`
+
+## Me
+- `GET /me`
 
 ## Feed
 - `GET /posts`

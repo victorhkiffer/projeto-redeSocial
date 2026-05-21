@@ -4,6 +4,8 @@ import jwt from '@fastify/jwt'
 import { env } from './env'
 import { pool } from './db'
 import authRoutes from './routes/auth'
+import meRoutes from './routes/me'
+import representativesRoutes from './routes/representatives'
 
 const app = Fastify({ logger: true })
 
@@ -22,7 +24,8 @@ app.get('/health', async () => {
 })
 
 await app.register(authRoutes)
+await app.register(meRoutes)
+await app.register(representativesRoutes)
 
 const address = await app.listen({ host: '0.0.0.0', port: env.PORT })
 app.log.info({ address }, 'server listening')
-

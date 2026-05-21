@@ -60,9 +60,9 @@ Estado operacional (atualize continuamente):
 - [ ] Perfil da empresa
 - [ ] Edição de perfil
 - [ ] Upload de logo
-- [ ] Cadastro de representantes
-- [ ] Aprovação de representantes
-- [ ] Remoção de representantes
+- [x] Cadastro de representantes (API + UI v1)
+- [x] Aprovação de representantes (API + UI v1)
+- [x] Remoção de representantes (API v1: disable + UI)
 
 #### Rede Social
 - [ ] Criar postagem
@@ -218,7 +218,7 @@ Critérios de teste e aceite objetivos. Evite “como funciona”; foque em como
   - [x] Consegue conectar no PostgreSQL com credenciais do `.env` (via `docker exec ... psql`)
   - [x] Rodar `db/migrations/0001_init.sql` sem erro
 - Critérios de aceite por fluxo:
-  - Auth (v1): [x] representante consegue criar conta, entrar, sair (validado via `api` smoke). [x] frontend tem forms e guarda de rotas para `/app/*` (validado via build). [ ] representante PENDING não acessa rotas protegidas (pendente quando existirem rotas protegidas e fluxo de aprovação).
+  - Auth (v1): [x] representante consegue criar conta, entrar, sair (validado via `api` smoke). [x] frontend tem forms e guarda de rotas para `/app/*` (validado via build). [x] representante PENDING não consegue acessar rotas protegidas (validado no `api` smoke via login 403 antes da aprovação).
   - Feed (v1): empresa cria postagem; outra empresa vê no feed; curte e comenta.
   - Serviços (v1): empresa solicita serviço; prestadora envia proposta; solicitante aceita; após “concluído” ambos podem avaliar.
 - Regressões importantes:
@@ -263,6 +263,7 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Rotas/Tema/UI: `C:\\Program Files\\nodejs\\npm.cmd install react-router-dom` + `C:\\Program Files\\nodejs\\npm.cmd install -D tailwindcss@3 postcss autoprefixer`
   - Build: `C:\\Program Files\\nodejs\\npm.cmd run build`
   - Build (após integrar Auth UI): `C:\\Program Files\\nodejs\\npm.cmd run build`
+  - Build (após UI de representantes): `C:\\Program Files\\nodejs\\npm.cmd run build`
 - Exemplos:
   - `docker compose up -d db`
   - Aplicar migração: `psql -f db/migrations/0001_init.sql ...` (cliente/conn string a definir)

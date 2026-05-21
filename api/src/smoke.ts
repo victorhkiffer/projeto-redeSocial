@@ -2,6 +2,8 @@ import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import jwt from '@fastify/jwt'
 import authRoutes from './routes/auth'
+import meRoutes from './routes/me'
+import representativesRoutes from './routes/representatives'
 import { env } from './env'
 
 async function main() {
@@ -10,6 +12,8 @@ async function main() {
   await app.register(cors, { origin: env.CORS_ORIGIN })
   await app.register(jwt, { secret: env.JWT_ACCESS_SECRET })
   await app.register(authRoutes)
+  await app.register(meRoutes)
+  await app.register(representativesRoutes)
 
   await app.listen({ host: '127.0.0.1', port: env.PORT })
 
@@ -35,7 +39,48 @@ async function main() {
     body: JSON.stringify({ email, password })
   })
   if (!login.ok) throw new Error(`login failed: ${login.status} ${await login.text()}`)
-  const { refreshToken } = (await login.json()) as { refreshToken: string }
+  const { refreshToken, accessToken } = (await login.json()) as { refreshToken: string; accessToken: string }
+
+  const meRes = await fetch(`${base}/me`, {
+    headers: { authorization: `Bearer ${accessToken}` }
+  })
+  if (!meRes.ok) throw new Error(`me failed: ${meRes.status} ${await meRes.text()}`)
+  const me = (await meRes.json()) as { company: { id: string } }
+  const companyId = me.company.id
+
+  const memberEmail = `member+${Date.now()}@example.com`
+  const memberPassword = 'password123'
+
+  const createRep = await fetch(`${base}/companies/${companyId}/representatives`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ name: 'Member Teste', email: memberEmail, password: memberPassword, role: 'MEMBER' })
+  })
+  if (!createRep.ok) throw new Error(`create representative failed: ${createRep.status} ${await createRep.text()}`)
+  const { id: memberId } = (await createRep.json()) as { id: string }
+
+  const pendingLogin = await fetch(`${base}/auth/login`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email: memberEmail, password: memberPassword })
+  })
+  if (pendingLogin.status !== 403) {
+    throw new Error(`pending representative should be forbidden, got: ${pendingLogin.status} ${await pendingLogin.text()}`)
+  }
+
+  const approve = await fetch(`${base}/representatives/${memberId}/approve`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({})
+  })
+  if (!approve.ok) throw new Error(`approve representative failed: ${approve.status} ${await approve.text()}`)
+
+  const activeLogin = await fetch(`${base}/auth/login`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email: memberEmail, password: memberPassword })
+  })
+  if (!activeLogin.ok) throw new Error(`active representative login failed: ${activeLogin.status} ${await activeLogin.text()}`)
 
   const refresh = await fetch(`${base}/auth/refresh`, {
     method: 'POST',
@@ -59,4 +104,3 @@ main().catch((err) => {
   console.error(err)
   process.exit(1)
 })
-
