@@ -45,12 +45,12 @@ Estado operacional (atualize continuamente):
 ### Next
 #### Fundação
 - [x] Criar repositório Git (já existe, branch `main` com `origin/main`)
-- [ ] Configurar projeto React (pendente: ambiente sem Node.js)
-- [ ] Configurar banco de dados (subir localmente + validar migração)
+- [x] Configurar projeto React (Vite + React TS em `frontend/`)
+- [x] Configurar banco de dados (subir localmente + validar migração)
 - [ ] Configurar autenticação
-- [ ] Configurar sistema de rotas
-- [ ] Criar layout principal
-- [ ] Implementar tema claro e escuro
+- [x] Configurar sistema de rotas (React Router)
+- [x] Criar layout principal (PublicLayout/AppLayout)
+- [x] Implementar tema claro e escuro (toggle + CSS vars)
 
 #### Empresas e Usuários
 - [ ] Cadastro de empresa
@@ -103,11 +103,14 @@ Estado operacional (atualize continuamente):
 ## Surprises & Discoveries
 - 2026-05-21: Ambiente atual não tem Node.js/NPM instalados (`node`/`npm` não reconhecidos). Isso bloqueia scaffold do React e dependências JS por enquanto.
 - 2026-05-21: `docker compose up -d db` falhou porque o Docker daemon/engine não está acessível no ambiente (pipe `//./pipe/docker_engine` não encontrado). Validação do DB ficou pendente.
+- 2026-05-21: Resolução Docker: iniciar `Docker Desktop.exe` habilitou o daemon (`docker info` ok) e permitiu subir o Postgres via compose.
+- 2026-05-21: Resolução Node: instalado via `winget`. Em PowerShell, `npm` pode cair no `npm.ps1` (bloqueado por policy); usar `C:\\Program Files\\nodejs\\npm.cmd` (ou ajustar policy) evita o erro.
 
 ## Decision Log
 - 2026-05-21: Banco de dados alvo: PostgreSQL (modelagem v1 em SQL). Chaves primárias `uuid`, timestamps `timestamptz`.
 - 2026-05-21: Identidade de usuário: Representante autentica; ações ocorrem “em nome” de uma Empresa (representante pertence a uma empresa).
 - 2026-05-21: Chat e follow são entre Empresas (não entre representantes).
+- 2026-05-21: Frontend v1: Vite + React + TypeScript, rotas com React Router e UI base com Tailwind (darkMode por classe).
 
 ## Outcomes & Retrospective
 Nada registrado.
@@ -198,14 +201,15 @@ Comandos e passos operacionais repetíveis (setup, rodar, testes, migrações). 
   - Smoke: subir DB e conectar via `psql` (ou cliente equivalente)
 - Migrações/seed:
   - Aplicar SQL de `db/migrations` em ordem (v1 manual)
+  - Exemplo (sem `psql` local): `docker exec conecta-db psql -U conecta -d conecta_empreendedor -f /tmp/0001_init.sql`
 
 ## Validation and Acceptance
 Critérios de teste e aceite objetivos. Evite “como funciona”; foque em como validar.
 
 - Smoke checklist:
-  - `docker compose up -d db` sobe sem erro
-  - Consegue conectar no PostgreSQL com credenciais do `.env`
-  - Rodar `db/migrations/0001_init.sql` sem erro
+  - [x] `docker compose up -d db` sobe sem erro
+  - [x] Consegue conectar no PostgreSQL com credenciais do `.env` (via `docker exec ... psql`)
+  - [x] Rodar `db/migrations/0001_init.sql` sem erro
 - Critérios de aceite por fluxo:
   - Auth (v1): representante consegue criar conta, entrar, sair; representante PENDING não acessa rotas protegidas.
   - Feed (v1): empresa cria postagem; outra empresa vê no feed; curte e comenta.
@@ -232,6 +236,20 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - `git add -A` (fora do sandbox) necessário por permissão negada ao escrever em `.git/`
   - `docker --version` -> Docker CLI existe, mas erro de permissão ao ler `C:\\Users\\Pc\\.docker\\config.json`
   - `docker compose up -d db` -> falhou sem acesso ao daemon (`//./pipe/docker_engine`)
+- Comandos (DB/validação):
+  - Criar `.env`: `Copy-Item .\\.env.example .\\.env`
+  - Iniciar Docker Desktop: `Start-Process \"C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe\"`
+  - Verificar daemon: `docker info`
+  - Subir DB: `docker compose up -d db`
+  - Readiness: `docker exec -e PGPASSWORD=... conecta-db pg_isready -U conecta -d conecta_empreendedor`
+  - Aplicar migração: `docker cp db/migrations/0001_init.sql conecta-db:/tmp/0001_init.sql` + `docker exec ... psql -f /tmp/0001_init.sql`
+  - Listar tabelas: `docker exec ... psql -c \"\\dt\"`
+- Comandos (frontend):
+  - Instalar Node: `winget install --id OpenJS.NodeJS.LTS -e --source winget --accept-package-agreements --accept-source-agreements`
+  - Scaffold: `C:\\Program Files\\nodejs\\npm.cmd create vite@latest frontend -- --template react-ts`
+  - Dependências: `C:\\Program Files\\nodejs\\npm.cmd install`
+  - Rotas/Tema/UI: `C:\\Program Files\\nodejs\\npm.cmd install react-router-dom` + `C:\\Program Files\\nodejs\\npm.cmd install -D tailwindcss@3 postcss autoprefixer`
+  - Build: `C:\\Program Files\\nodejs\\npm.cmd run build`
 - Exemplos:
   - `docker compose up -d db`
   - Aplicar migração: `psql -f db/migrations/0001_init.sql ...` (cliente/conn string a definir)
@@ -243,5 +261,6 @@ Dependências, integrações e contratos (internos/externos). Não confundir com
 
 - Dependências runtime:
   - PostgreSQL (via Docker no dev)
+  - Frontend: React + Vite
 - Contratos e interfaces:
   - API HTTP (a definir em `contracts/`): Auth, Empresas, Feed, Serviços, Avaliações, Chat (futuro)
