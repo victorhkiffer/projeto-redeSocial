@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import ThemeToggle from '../components/ThemeToggle'
+import { useAuth } from '../auth/AuthContext'
 
 const nav = [
   { to: '/app/dashboard', label: 'Dashboard' },
@@ -13,6 +14,14 @@ const nav = [
 ]
 
 export default function AppLayout() {
+  const auth = useAuth()
+  const navigate = useNavigate()
+
+  async function onLogout() {
+    await auth.logout()
+    navigate('/login', { replace: true })
+  }
+
   return (
     <div className="min-h-screen">
       <header className="border-b border-[color:var(--border)] bg-[color:var(--card)]">
@@ -21,7 +30,16 @@ export default function AppLayout() {
             <div className="h-8 w-8 rounded-lg bg-[color:var(--primary)]" />
             <span className="font-semibold">Conecta Empreendedor</span>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button
+              type="button"
+              onClick={onLogout}
+              className="rounded-lg border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-2 text-sm hover:border-[color:var(--primary)]"
+            >
+              Sair
+            </button>
+          </div>
         </div>
       </header>
 

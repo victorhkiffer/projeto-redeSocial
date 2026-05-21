@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import RequireAuth from './auth/RequireAuth'
 import AppLayout from './layouts/AppLayout'
 import PublicLayout from './layouts/PublicLayout'
 import Dashboard from './pages/app/Dashboard'
@@ -25,17 +26,19 @@ export default function App() {
         <Route path="recuperar-senha" element={<RecoverPassword />} />
       </Route>
 
-      <Route path="app" element={<AppLayout />}>
-        <Route index element={<Navigate to="feed" replace />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="feed" element={<Feed />} />
-        <Route path="pesquisa" element={<Search />} />
-        <Route path="empresa/:id" element={<CompanyProfile />} />
-        <Route path="configuracoes/perfil" element={<ProfileSettings />} />
-        <Route path="representantes" element={<Representatives />} />
-        <Route path="servicos" element={<Services />} />
-        <Route path="chat" element={<Chat />} />
-        <Route path="avaliacoes" element={<Reviews />} />
+      <Route element={<RequireAuth />}>
+        <Route path="app" element={<AppLayout />}>
+          <Route index element={<Navigate to="feed" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="feed" element={<Feed />} />
+          <Route path="pesquisa" element={<Search />} />
+          <Route path="empresa/:id" element={<CompanyProfile />} />
+          <Route path="configuracoes/perfil" element={<ProfileSettings />} />
+          <Route path="representantes" element={<Representatives />} />
+          <Route path="servicos" element={<Services />} />
+          <Route path="chat" element={<Chat />} />
+          <Route path="avaliacoes" element={<Reviews />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

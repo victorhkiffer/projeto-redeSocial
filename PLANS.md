@@ -53,9 +53,9 @@ Estado operacional (atualize continuamente):
 - [x] Implementar tema claro e escuro (toggle + CSS vars)
 
 #### Empresas e Usuários
-- [x] Cadastro de empresa (API v1: `POST /auth/register`)
-- [x] Login (API v1: `POST /auth/login`)
-- [x] Logout (API v1: `POST /auth/logout`)
+- [x] Cadastro de empresa (API v1 + frontend: `POST /auth/register`)
+- [x] Login (API v1 + frontend: `POST /auth/login`)
+- [x] Logout (API v1 + frontend: `POST /auth/logout`)
 - [ ] Recuperação de senha
 - [ ] Perfil da empresa
 - [ ] Edição de perfil
@@ -113,6 +113,7 @@ Estado operacional (atualize continuamente):
 - 2026-05-21: Chat e follow são entre Empresas (não entre representantes).
 - 2026-05-21: Frontend v1: Vite + React + TypeScript, rotas com React Router e UI base com Tailwind (darkMode por classe).
 - 2026-05-21: Backend v1: Fastify + TypeScript + `pg` (SQL direto), Auth com JWT access token + refresh token opaco persistido em `auth_sessions`.
+- 2026-05-21: Frontend Auth v1: tokens em `localStorage` + refresh automático no bootstrap; rotas `/app/*` protegidas por guard.
 
 ## Outcomes & Retrospective
 Nada registrado.
@@ -217,7 +218,7 @@ Critérios de teste e aceite objetivos. Evite “como funciona”; foque em como
   - [x] Consegue conectar no PostgreSQL com credenciais do `.env` (via `docker exec ... psql`)
   - [x] Rodar `db/migrations/0001_init.sql` sem erro
 - Critérios de aceite por fluxo:
-  - Auth (v1): [x] representante consegue criar conta, entrar, sair (validado via `api` smoke). [ ] representante PENDING não acessa rotas protegidas (pendente quando existirem rotas protegidas e fluxo de aprovação).
+  - Auth (v1): [x] representante consegue criar conta, entrar, sair (validado via `api` smoke). [x] frontend tem forms e guarda de rotas para `/app/*` (validado via build). [ ] representante PENDING não acessa rotas protegidas (pendente quando existirem rotas protegidas e fluxo de aprovação).
   - Feed (v1): empresa cria postagem; outra empresa vê no feed; curte e comenta.
   - Serviços (v1): empresa solicita serviço; prestadora envia proposta; solicitante aceita; após “concluído” ambos podem avaliar.
 - Regressões importantes:
@@ -261,6 +262,7 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Dependências: `C:\\Program Files\\nodejs\\npm.cmd install`
   - Rotas/Tema/UI: `C:\\Program Files\\nodejs\\npm.cmd install react-router-dom` + `C:\\Program Files\\nodejs\\npm.cmd install -D tailwindcss@3 postcss autoprefixer`
   - Build: `C:\\Program Files\\nodejs\\npm.cmd run build`
+  - Build (após integrar Auth UI): `C:\\Program Files\\nodejs\\npm.cmd run build`
 - Exemplos:
   - `docker compose up -d db`
   - Aplicar migração: `psql -f db/migrations/0001_init.sql ...` (cliente/conn string a definir)
