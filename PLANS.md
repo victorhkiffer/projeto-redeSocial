@@ -255,6 +255,7 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Aplicar migração: `psql -f db/migrations/0001_init.sql ...` (cliente/conn string a definir)
   - Arquivos criados: `docker-compose.yml`, `.env.example`, `db/migrations/0001_init.sql`, `docs/screens.md`, `docs/stack.md`, `contracts/api-v1.md`
   - Commit: `00a5084` ("Add DB model v1 and infra docs")
+  - Commit: `96045f1` ("Scaffold frontend with routing and theming")
 
 ## Interfaces and Dependencies
 Dependências, integrações e contratos (internos/externos). Não confundir com “comandos” nem com “backlog”.
