@@ -12,6 +12,13 @@ Objetivo: alinhar entidades/fluxos antes da implementação. Campos finais podem
 - `GET /companies/:id`
 - `PATCH /companies/:id`
 - `POST /companies/:id/logo` (v1: atualiza `logoUrl`; upload real futuro)
+- `GET /companies/search?q=...`
+
+## Follows
+- `POST /companies/:id/follow`
+- `POST /companies/:id/unfollow`
+- `GET /companies/:id/followers`
+- `GET /companies/:id/following`
 
 ## Representantes
 - `GET /companies/:id/representatives`

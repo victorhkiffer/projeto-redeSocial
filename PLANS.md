@@ -69,8 +69,8 @@ Estado operacional (atualize continuamente):
 - [x] Feed de publicações (API + UI v1)
 - [x] Curtidas (API + UI v1)
 - [x] Comentários (API + UI v1)
-- [ ] Sistema de seguir empresas
-- [ ] Pesquisa de empresas
+- [x] Sistema de seguir empresas (API + UI v1)
+- [x] Pesquisa de empresas (API + UI v1)
 
 #### Serviços
 - [ ] Cadastro de serviços
@@ -221,6 +221,7 @@ Critérios de teste e aceite objetivos. Evite “como funciona”; foque em como
   - Auth (v1): [x] representante consegue criar conta, entrar, sair (validado via `api` smoke). [x] frontend tem forms e guarda de rotas para `/app/*` (validado via build). [x] representante PENDING não consegue acessar rotas protegidas (validado no `api` smoke via login 403 antes da aprovação).
   - Empresa (v1): [x] editar campos básicos do perfil (validado via `api` smoke: `PATCH /companies/:id`). [x] UI de perfil carrega e permite editar (validado via build).
   - Feed (v1): [x] criar post (validado via `api` smoke). [x] curtir e comentar (validado via `api` smoke). [x] UI do feed build ok.
+  - Follow/Search (v1): [x] buscar empresa por nome e seguir/deixar de seguir (validado via `api` smoke + UI build).
   - Feed (v1): empresa cria postagem; outra empresa vê no feed; curte e comenta.
   - Serviços (v1): empresa solicita serviço; prestadora envia proposta; solicitante aceita; após “concluído” ambos podem avaliar.
 - Regressões importantes:
@@ -267,6 +268,7 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Build (após integrar Auth UI): `C:\\Program Files\\nodejs\\npm.cmd run build`
   - Build (após UI de representantes): `C:\\Program Files\\nodejs\\npm.cmd run build`
   - Build (após feed): `C:\\Program Files\\nodejs\\npm.cmd run build`
+  - Build (após follow/search): `C:\\Program Files\\nodejs\\npm.cmd run build`
 - Exemplos:
   - `docker compose up -d db`
   - Aplicar migração: `psql -f db/migrations/0001_init.sql ...` (cliente/conn string a definir)

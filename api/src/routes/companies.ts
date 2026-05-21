@@ -34,6 +34,51 @@ function ensureAdminOrOwner(role: string) {
 }
 
 export default async function companiesRoutes(app: FastifyInstance) {
+  app.get('/companies/search', { preHandler: requireAuth(app) }, async (req: any) => {
+    const user = req.authUser!
+    const query = z
+      .object({
+        q: z.string().min(1).max(100),
+        limit: z.coerce.number().int().min(1).max(50).default(20)
+      })
+      .parse(req.query ?? {})
+
+    const res = await pool.query<{
+      id: string
+      name: string
+      industry: string | null
+      logo_url: string | null
+      followed_by_me: boolean
+    }>(
+      `
+      select
+        c.id,
+        c.name,
+        c.industry,
+        c.logo_url,
+        exists(
+          select 1 from follows f
+          where f.follower_company_id = $2 and f.followed_company_id = c.id
+        ) as followed_by_me
+      from companies c
+      where c.name ilike ('%' || $1 || '%')
+      order by c.name asc
+      limit $3
+      `,
+      [query.q, user.companyId, query.limit]
+    )
+
+    return {
+      items: res.rows.map((r) => ({
+        id: r.id,
+        name: r.name,
+        industry: r.industry,
+        logoUrl: r.logo_url,
+        followedByMe: r.followed_by_me
+      }))
+    }
+  })
+
   app.get('/companies/:id', { preHandler: requireAuth(app) }, async (req: any, reply) => {
     const companyId = String(req.params.id)
     const res = await pool.query<{
@@ -131,4 +176,3 @@ export default async function companiesRoutes(app: FastifyInstance) {
     return { ok: true }
   })
 }
-

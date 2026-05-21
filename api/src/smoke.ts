@@ -6,6 +6,7 @@ import meRoutes from './routes/me'
 import representativesRoutes from './routes/representatives'
 import companiesRoutes from './routes/companies'
 import postsRoutes from './routes/posts'
+import followsRoutes from './routes/follows'
 import { env } from './env'
 
 async function main() {
@@ -18,6 +19,7 @@ async function main() {
   await app.register(representativesRoutes)
   await app.register(companiesRoutes)
   await app.register(postsRoutes)
+  await app.register(followsRoutes)
 
   await app.listen({ host: '127.0.0.1', port: env.PORT })
 
@@ -117,6 +119,48 @@ async function main() {
     body: JSON.stringify({ email: memberEmail, password: memberPassword })
   })
   if (!activeLogin.ok) throw new Error(`active representative login failed: ${activeLogin.status} ${await activeLogin.text()}`)
+
+  const otherCompanyName = `Empresa Outra ${Date.now()}`
+  const otherEmail = `other+${Date.now()}@example.com`
+  const otherPassword = 'password123'
+  const otherReg = await fetch(`${base}/auth/register`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      companyName: otherCompanyName,
+      representativeName: 'Owner Outro',
+      email: otherEmail,
+      password: otherPassword
+    })
+  })
+  if (!otherReg.ok) throw new Error(`other register failed: ${otherReg.status} ${await otherReg.text()}`)
+
+  const search = await fetch(`${base}/companies/search?q=${encodeURIComponent('Empresa Outra')}&limit=10`, {
+    headers: { authorization: `Bearer ${accessToken}` }
+  })
+  if (!search.ok) throw new Error(`search companies failed: ${search.status} ${await search.text()}`)
+  const searchJson = (await search.json()) as { items: Array<{ id: string; name: string }> }
+  const otherCompany = searchJson.items.find((i) => i.name === otherCompanyName)
+  if (!otherCompany) throw new Error('search did not return other company')
+
+  const follow = await fetch(`${base}/companies/${otherCompany.id}/follow`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({})
+  })
+  if (!follow.ok) throw new Error(`follow failed: ${follow.status} ${await follow.text()}`)
+
+  const followingList = await fetch(`${base}/companies/${companyId}/following?limit=5`, {
+    headers: { authorization: `Bearer ${accessToken}` }
+  })
+  if (!followingList.ok) throw new Error(`following list failed: ${followingList.status} ${await followingList.text()}`)
+
+  const unfollow = await fetch(`${base}/companies/${otherCompany.id}/unfollow`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({})
+  })
+  if (!unfollow.ok) throw new Error(`unfollow failed: ${unfollow.status} ${await unfollow.text()}`)
 
   const refresh = await fetch(`${base}/auth/refresh`, {
     method: 'POST',
