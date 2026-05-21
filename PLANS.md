@@ -102,6 +102,7 @@ Estado operacional (atualize continuamente):
 
 ## Surprises & Discoveries
 - 2026-05-21: Ambiente atual não tem Node.js/NPM instalados (`node`/`npm` não reconhecidos). Isso bloqueia scaffold do React e dependências JS por enquanto.
+- 2026-05-21: `docker compose up -d db` falhou porque o Docker daemon/engine não está acessível no ambiente (pipe `//./pipe/docker_engine` não encontrado). Validação do DB ficou pendente.
 
 ## Decision Log
 - 2026-05-21: Banco de dados alvo: PostgreSQL (modelagem v1 em SQL). Chaves primárias `uuid`, timestamps `timestamptz`.
@@ -229,6 +230,8 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - `node -v; npm -v` -> comandos não reconhecidos (ambiente sem Node.js)
   - `git status` -> `assets/` e `screens/` estavam como untracked; mantidos no repo
   - `git add -A` (fora do sandbox) necessário por permissão negada ao escrever em `.git/`
+  - `docker --version` -> Docker CLI existe, mas erro de permissão ao ler `C:\\Users\\Pc\\.docker\\config.json`
+  - `docker compose up -d db` -> falhou sem acesso ao daemon (`//./pipe/docker_engine`)
 - Exemplos:
   - `docker compose up -d db`
   - Aplicar migração: `psql -f db/migrations/0001_init.sql ...` (cliente/conn string a definir)
