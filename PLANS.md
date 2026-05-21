@@ -280,6 +280,7 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Commit: `a6b5aaf` ("Add representatives management and /me endpoint")
   - Commit: `cbedb82` ("Add company profile endpoints and profile settings UI")
   - Commit: `819270b` ("Add feed posts with likes and comments")
+  - Commit: `3435357` ("Add company follow system and search")
 
 ## Interfaces and Dependencies
 Dependências, integrações e contratos (internos/externos). Não confundir com “comandos” nem com “backlog”.
