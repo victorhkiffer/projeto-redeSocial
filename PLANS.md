@@ -39,8 +39,8 @@ Estado operacional (atualize continuamente):
 
 ### Doing
 - [x] Configurar banco de dados (docker-compose + .env.example)
-- [ ] Especificar fluxos e critérios de aceite (auth, feed, serviços)
-- [ ] Definir contratos básicos de API (v1)
+- [x] Especificar fluxos e critérios de aceite (auth, feed, serviços)
+- [x] Definir contratos básicos de API (v1)
 
 ### Next
 #### Fundação
