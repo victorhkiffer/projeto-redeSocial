@@ -38,7 +38,7 @@ Estado operacional (atualize continuamente):
 - [x] Escolha da stack tecnológica (v1)
 
 ### Doing
-- [ ] Configurar banco de dados (docker-compose + .env.example)
+- [x] Configurar banco de dados (docker-compose + .env.example)
 - [ ] Especificar fluxos e critérios de aceite (auth, feed, serviços)
 - [ ] Definir contratos básicos de API (v1)
 
@@ -46,7 +46,7 @@ Estado operacional (atualize continuamente):
 #### Fundação
 - [x] Criar repositório Git (já existe, branch `main` com `origin/main`)
 - [ ] Configurar projeto React (pendente: ambiente sem Node.js)
-- [ ] Configurar banco de dados (infra no repo; subir localmente pendente)
+- [ ] Configurar banco de dados (subir localmente + validar migração)
 - [ ] Configurar autenticação
 - [ ] Configurar sistema de rotas
 - [ ] Criar layout principal
@@ -228,10 +228,12 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
 - Logs:
   - `node -v; npm -v` -> comandos não reconhecidos (ambiente sem Node.js)
   - `git status` -> `assets/` e `screens/` estavam como untracked; mantidos no repo
+  - `git add -A` (fora do sandbox) necessário por permissão negada ao escrever em `.git/`
 - Exemplos:
   - `docker compose up -d db`
   - Aplicar migração: `psql -f db/migrations/0001_init.sql ...` (cliente/conn string a definir)
   - Arquivos criados: `docker-compose.yml`, `.env.example`, `db/migrations/0001_init.sql`, `docs/screens.md`, `docs/stack.md`, `contracts/api-v1.md`
+  - Commit: `00a5084` ("Add DB model v1 and infra docs")
 
 ## Interfaces and Dependencies
 Dependências, integrações e contratos (internos/externos). Não confundir com “comandos” nem com “backlog”.
