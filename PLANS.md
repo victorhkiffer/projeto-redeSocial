@@ -269,6 +269,8 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Arquivos criados: `docker-compose.yml`, `.env.example`, `db/migrations/0001_init.sql`, `docs/screens.md`, `docs/stack.md`, `contracts/api-v1.md`
   - Commit: `00a5084` ("Add DB model v1 and infra docs")
   - Commit: `96045f1` ("Scaffold frontend with routing and theming")
+  - Commit: `986c20f` ("Add backend auth API and refresh sessions")
+  - Commit: `bd91d81` ("Integrate frontend auth with API and protect routes")
 
 ## Interfaces and Dependencies
 Dependências, integrações e contratos (internos/externos). Não confundir com “comandos” nem com “backlog”.
