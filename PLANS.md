@@ -277,6 +277,7 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Commit: `bd91d81` ("Integrate frontend auth with API and protect routes")
   - Commit: `a6b5aaf` ("Add representatives management and /me endpoint")
   - Commit: `cbedb82` ("Add company profile endpoints and profile settings UI")
+  - Commit: `819270b` ("Add feed posts with likes and comments")
 
 ## Interfaces and Dependencies
 Dependências, integrações e contratos (internos/externos). Não confundir com “comandos” nem com “backlog”.
