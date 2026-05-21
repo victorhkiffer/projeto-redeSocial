@@ -272,6 +272,7 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Commit: `96045f1` ("Scaffold frontend with routing and theming")
   - Commit: `986c20f` ("Add backend auth API and refresh sessions")
   - Commit: `bd91d81` ("Integrate frontend auth with API and protect routes")
+  - Commit: `a6b5aaf` ("Add representatives management and /me endpoint")
 
 ## Interfaces and Dependencies
 Dependências, integrações e contratos (internos/externos). Não confundir com “comandos” nem com “backlog”.
