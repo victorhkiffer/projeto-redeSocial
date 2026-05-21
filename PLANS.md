@@ -47,15 +47,15 @@ Estado operacional (atualize continuamente):
 - [x] Criar repositório Git (já existe, branch `main` com `origin/main`)
 - [x] Configurar projeto React (Vite + React TS em `frontend/`)
 - [x] Configurar banco de dados (subir localmente + validar migração)
-- [ ] Configurar autenticação
+- [x] Configurar autenticação (API v1: register/login/refresh/logout + refresh sessions)
 - [x] Configurar sistema de rotas (React Router)
 - [x] Criar layout principal (PublicLayout/AppLayout)
 - [x] Implementar tema claro e escuro (toggle + CSS vars)
 
 #### Empresas e Usuários
-- [ ] Cadastro de empresa
-- [ ] Login
-- [ ] Logout
+- [x] Cadastro de empresa (API v1: `POST /auth/register`)
+- [x] Login (API v1: `POST /auth/login`)
+- [x] Logout (API v1: `POST /auth/logout`)
 - [ ] Recuperação de senha
 - [ ] Perfil da empresa
 - [ ] Edição de perfil
@@ -105,12 +105,14 @@ Estado operacional (atualize continuamente):
 - 2026-05-21: `docker compose up -d db` falhou porque o Docker daemon/engine não está acessível no ambiente (pipe `//./pipe/docker_engine` não encontrado). Validação do DB ficou pendente.
 - 2026-05-21: Resolução Docker: iniciar `Docker Desktop.exe` habilitou o daemon (`docker info` ok) e permitiu subir o Postgres via compose.
 - 2026-05-21: Resolução Node: instalado via `winget`. Em PowerShell, `npm` pode cair no `npm.ps1` (bloqueado por policy); usar `C:\\Program Files\\nodejs\\npm.cmd` (ou ajustar policy) evita o erro.
+- 2026-05-21: `winget search` sem `--source winget` tentou usar `msstore` e pediu aceite interativo; usar `--source winget` evita prompt (não-interativo).
 
 ## Decision Log
 - 2026-05-21: Banco de dados alvo: PostgreSQL (modelagem v1 em SQL). Chaves primárias `uuid`, timestamps `timestamptz`.
 - 2026-05-21: Identidade de usuário: Representante autentica; ações ocorrem “em nome” de uma Empresa (representante pertence a uma empresa).
 - 2026-05-21: Chat e follow são entre Empresas (não entre representantes).
 - 2026-05-21: Frontend v1: Vite + React + TypeScript, rotas com React Router e UI base com Tailwind (darkMode por classe).
+- 2026-05-21: Backend v1: Fastify + TypeScript + `pg` (SQL direto), Auth com JWT access token + refresh token opaco persistido em `auth_sessions`.
 
 ## Outcomes & Retrospective
 Nada registrado.
@@ -197,11 +199,15 @@ Comandos e passos operacionais repetíveis (setup, rodar, testes, migrações). 
   - Criar `.env` a partir de `.env.example`
 - Rodar localmente:
   - `docker compose up -d db`
+  - API: `cd api` + `C:\\Program Files\\nodejs\\npm.cmd install` + `C:\\Program Files\\nodejs\\npm.cmd run dev`
+  - Frontend: `cd frontend` + `C:\\Program Files\\nodejs\\npm.cmd install` + `C:\\Program Files\\nodejs\\npm.cmd run dev`
 - Testes:
   - Smoke: subir DB e conectar via `psql` (ou cliente equivalente)
+  - API smoke: `cd api` + `C:\\Program Files\\nodejs\\npm.cmd run smoke`
 - Migrações/seed:
   - Aplicar SQL de `db/migrations` em ordem (v1 manual)
   - Exemplo (sem `psql` local): `docker exec conecta-db psql -U conecta -d conecta_empreendedor -f /tmp/0001_init.sql`
+  - Auth sessions: `docker exec conecta-db psql -U conecta -d conecta_empreendedor -f /tmp/0002_auth_sessions.sql`
 
 ## Validation and Acceptance
 Critérios de teste e aceite objetivos. Evite “como funciona”; foque em como validar.
@@ -211,7 +217,7 @@ Critérios de teste e aceite objetivos. Evite “como funciona”; foque em como
   - [x] Consegue conectar no PostgreSQL com credenciais do `.env` (via `docker exec ... psql`)
   - [x] Rodar `db/migrations/0001_init.sql` sem erro
 - Critérios de aceite por fluxo:
-  - Auth (v1): representante consegue criar conta, entrar, sair; representante PENDING não acessa rotas protegidas.
+  - Auth (v1): [x] representante consegue criar conta, entrar, sair (validado via `api` smoke). [ ] representante PENDING não acessa rotas protegidas (pendente quando existirem rotas protegidas e fluxo de aprovação).
   - Feed (v1): empresa cria postagem; outra empresa vê no feed; curte e comenta.
   - Serviços (v1): empresa solicita serviço; prestadora envia proposta; solicitante aceita; após “concluído” ambos podem avaliar.
 - Regressões importantes:
@@ -243,7 +249,12 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Subir DB: `docker compose up -d db`
   - Readiness: `docker exec -e PGPASSWORD=... conecta-db pg_isready -U conecta -d conecta_empreendedor`
   - Aplicar migração: `docker cp db/migrations/0001_init.sql conecta-db:/tmp/0001_init.sql` + `docker exec ... psql -f /tmp/0001_init.sql`
+  - Auth sessions: `docker cp db/migrations/0002_auth_sessions.sql conecta-db:/tmp/0002_auth_sessions.sql` + `docker exec ... psql -f /tmp/0002_auth_sessions.sql`
   - Listar tabelas: `docker exec ... psql -c \"\\dt\"`
+- Comandos (backend):
+  - Instalar deps: `cd api` + `C:\\Program Files\\nodejs\\npm.cmd install`
+  - Build: `cd api` + `C:\\Program Files\\nodejs\\npm.cmd run build`
+  - Smoke: `cd api` + `C:\\Program Files\\nodejs\\npm.cmd run smoke`
 - Comandos (frontend):
   - Instalar Node: `winget install --id OpenJS.NodeJS.LTS -e --source winget --accept-package-agreements --accept-source-agreements`
   - Scaffold: `C:\\Program Files\\nodejs\\npm.cmd create vite@latest frontend -- --template react-ts`
@@ -263,5 +274,6 @@ Dependências, integrações e contratos (internos/externos). Não confundir com
 - Dependências runtime:
   - PostgreSQL (via Docker no dev)
   - Frontend: React + Vite
+  - Backend: Fastify + Node.js
 - Contratos e interfaces:
   - API HTTP (a definir em `contracts/`): Auth, Empresas, Feed, Serviços, Avaliações, Chat (futuro)
