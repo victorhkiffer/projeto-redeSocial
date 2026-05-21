@@ -1,4 +1,4 @@
-# Conecta Empreendedor
+﻿# Conecta Empreendedor
 
 Este ExecPlan é um documento vivo. É um sistema de rede social B2B inspirado no LinkedIn.
 
@@ -22,15 +22,91 @@ Objetivos do produto:
 
 ## Progress
 Estado operacional (atualize continuamente):
-- Done: (nada registrado)
-- Doing: (nada registrado)
-- Next: (nada registrado)
+
+### Done
+- [x] Definição da proposta do produto
+- [x] Definição dos tipos de usuários
+- [x] Definição das permissões de Empresa e Representante
+- [x] Definição dos módulos principais do sistema
+- [x] Definição inicial das regras de negócio
+- [x] Definição da identidade visual
+- [x] Estruturação inicial do planejamento do projeto
+- [x] Modelagem do banco de dados (v1)
+- [x] Definição das entidades principais (v1)
+- [x] Definição dos relacionamentos entre entidades (v1)
+- [x] Planejamento das telas principais (v1)
+- [x] Escolha da stack tecnológica (v1)
+
+### Doing
+- [ ] Configurar banco de dados (docker-compose + .env.example)
+- [ ] Especificar fluxos e critérios de aceite (auth, feed, serviços)
+- [ ] Definir contratos básicos de API (v1)
+
+### Next
+#### Fundação
+- [x] Criar repositório Git (já existe, branch `main` com `origin/main`)
+- [ ] Configurar projeto React (pendente: ambiente sem Node.js)
+- [ ] Configurar banco de dados (infra no repo; subir localmente pendente)
+- [ ] Configurar autenticação
+- [ ] Configurar sistema de rotas
+- [ ] Criar layout principal
+- [ ] Implementar tema claro e escuro
+
+#### Empresas e Usuários
+- [ ] Cadastro de empresa
+- [ ] Login
+- [ ] Logout
+- [ ] Recuperação de senha
+- [ ] Perfil da empresa
+- [ ] Edição de perfil
+- [ ] Upload de logo
+- [ ] Cadastro de representantes
+- [ ] Aprovação de representantes
+- [ ] Remoção de representantes
+
+#### Rede Social
+- [ ] Criar postagem
+- [ ] Feed de publicações
+- [ ] Curtidas
+- [ ] Comentários
+- [ ] Sistema de seguir empresas
+- [ ] Pesquisa de empresas
+
+#### Serviços
+- [ ] Cadastro de serviços
+- [ ] Solicitação de serviços
+- [ ] Aceitar proposta
+- [ ] Rejeitar proposta
+- [ ] Histórico de serviços
+- [ ] Controle de status do serviço
+
+#### Comunicação
+- [ ] Chat entre empresas
+- [ ] Histórico de mensagens
+- [ ] Notificações
+- [ ] Compartilhamento de arquivos
+
+#### Reputação
+- [ ] Sistema de avaliações
+- [ ] Avaliação por estrelas
+- [ ] Comentários de avaliação
+- [ ] Média geral das empresas
+- [ ] Ranking por categoria
+
+#### Dashboard
+- [ ] Estatísticas da empresa
+- [ ] Serviços contratados
+- [ ] Serviços prestados
+- [ ] Histórico de avaliações
+- [ ] Crescimento de conexões
 
 ## Surprises & Discoveries
-Nada registrado.
+- 2026-05-21: Ambiente atual não tem Node.js/NPM instalados (`node`/`npm` não reconhecidos). Isso bloqueia scaffold do React e dependências JS por enquanto.
 
 ## Decision Log
-Nada registrado.
+- 2026-05-21: Banco de dados alvo: PostgreSQL (modelagem v1 em SQL). Chaves primárias `uuid`, timestamps `timestamptz`.
+- 2026-05-21: Identidade de usuário: Representante autentica; ações ocorrem “em nome” de uma Empresa (representante pertence a uma empresa).
+- 2026-05-21: Chat e follow são entre Empresas (não entre representantes).
 
 ## Outcomes & Retrospective
 Nada registrado.
@@ -98,40 +174,69 @@ Modo Escuro
 ## Plan of Work
 Backlog estruturado por frentes de trabalho. Detalhe suficiente para execução contínua, sem virar documentação de arquitetura.
 
-- Doing: (nada registrado)
-- Next: (nada registrado)
-- Later: (nada registrado)
+- Doing:
+  - Infra local de banco (docker-compose) + env
+  - Contratos mínimos de API (auth + feed + serviços)
+  - Critérios de aceite (smoke + fluxos)
+- Next:
+  - Scaffold frontend (React + rotas + tema) quando Node estiver disponível
+  - Scaffold backend (a definir conforme stack) e autenticação
+  - Migrações iniciais e seed
+- Later:
+  - Chat, notificações, ranking e dashboard
 
 ## Concrete Steps
 Comandos e passos operacionais repetíveis (setup, rodar, testes, migrações). Coloque comandos reais do projeto aqui.
 
-- Setup: (nada registrado)
-- Rodar localmente: (nada registrado)
-- Testes: (nada registrado)
-- Migrações/seed: (nada registrado)
+- Setup:
+  - Requisitos: Git, Docker Desktop (para PostgreSQL), Node.js (para frontend/backend JS)
+  - Criar `.env` a partir de `.env.example`
+- Rodar localmente:
+  - `docker compose up -d db`
+- Testes:
+  - Smoke: subir DB e conectar via `psql` (ou cliente equivalente)
+- Migrações/seed:
+  - Aplicar SQL de `db/migrations` em ordem (v1 manual)
 
 ## Validation and Acceptance
 Critérios de teste e aceite objetivos. Evite “como funciona”; foque em como validar.
 
-- Smoke checklist: (nada registrado)
-- Critérios de aceite por fluxo: (nada registrado)
-- Regressões importantes: (nada registrado)
+- Smoke checklist:
+  - `docker compose up -d db` sobe sem erro
+  - Consegue conectar no PostgreSQL com credenciais do `.env`
+  - Rodar `db/migrations/0001_init.sql` sem erro
+- Critérios de aceite por fluxo:
+  - Auth (v1): representante consegue criar conta, entrar, sair; representante PENDING não acessa rotas protegidas.
+  - Feed (v1): empresa cria postagem; outra empresa vê no feed; curte e comenta.
+  - Serviços (v1): empresa solicita serviço; prestadora envia proposta; solicitante aceita; após “concluído” ambos podem avaliar.
+- Regressões importantes:
+  - Integridade referencial: deletar empresa deve falhar se houver histórico relevante (serviços/avaliações)
 
 ## Idempotence and Recovery
 Como repetir tarefas com segurança e como recuperar de falhas (ex.: reset de ambiente, reprocessamentos).
 
-- Reset de ambiente: (nada registrado)
-- Reexecução segura: (nada registrado)
-- Plano de rollback: (nada registrado)
+- Reset de ambiente:
+  - `docker compose down -v` (apaga volume do DB local)
+- Reexecução segura:
+  - Recriar volume e reaplicar migrações em ordem
+- Plano de rollback:
+  - Recriar banco a partir de backup (futuro); por ora, reset local
 
 ## Artifacts and Notes
 Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs relevantes).
 
-- Logs: (nada registrado)
-- Exemplos: (nada registrado)
+- Logs:
+  - `node -v; npm -v` -> comandos não reconhecidos (ambiente sem Node.js)
+  - `git status` -> `assets/` e `screens/` estavam como untracked; mantidos no repo
+- Exemplos:
+  - `docker compose up -d db`
+  - Aplicar migração: `psql -f db/migrations/0001_init.sql ...` (cliente/conn string a definir)
+  - Arquivos criados: `docker-compose.yml`, `.env.example`, `db/migrations/0001_init.sql`, `docs/screens.md`, `docs/stack.md`, `contracts/api-v1.md`
 
 ## Interfaces and Dependencies
 Dependências, integrações e contratos (internos/externos). Não confundir com “comandos” nem com “backlog”.
 
-- Dependências runtime: (nada registrado)
-- Contratos e interfaces: (nada registrado)
+- Dependências runtime:
+  - PostgreSQL (via Docker no dev)
+- Contratos e interfaces:
+  - API HTTP (a definir em `contracts/`): Auth, Empresas, Feed, Serviços, Avaliações, Chat (futuro)
