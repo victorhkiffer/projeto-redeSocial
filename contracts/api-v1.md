@@ -11,7 +11,7 @@ Objetivo: alinhar entidades/fluxos antes da implementação. Campos finais podem
 ## Empresas
 - `GET /companies/:id`
 - `PATCH /companies/:id`
-- `POST /companies/:id/logo` (upload)
+- `POST /companies/:id/logo` (v1: atualiza `logoUrl`; upload real futuro)
 
 ## Representantes
 - `GET /companies/:id/representatives`

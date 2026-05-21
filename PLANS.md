@@ -57,9 +57,9 @@ Estado operacional (atualize continuamente):
 - [x] Login (API v1 + frontend: `POST /auth/login`)
 - [x] Logout (API v1 + frontend: `POST /auth/logout`)
 - [ ] Recuperação de senha
-- [ ] Perfil da empresa
-- [ ] Edição de perfil
-- [ ] Upload de logo
+- [x] Perfil da empresa (API + UI v1)
+- [x] Edição de perfil (API + UI v1)
+- [x] Upload de logo (v1: URL do logo via API + UI)
 - [x] Cadastro de representantes (API + UI v1)
 - [x] Aprovação de representantes (API + UI v1)
 - [x] Remoção de representantes (API v1: disable + UI)
@@ -219,6 +219,7 @@ Critérios de teste e aceite objetivos. Evite “como funciona”; foque em como
   - [x] Rodar `db/migrations/0001_init.sql` sem erro
 - Critérios de aceite por fluxo:
   - Auth (v1): [x] representante consegue criar conta, entrar, sair (validado via `api` smoke). [x] frontend tem forms e guarda de rotas para `/app/*` (validado via build). [x] representante PENDING não consegue acessar rotas protegidas (validado no `api` smoke via login 403 antes da aprovação).
+  - Empresa (v1): [x] editar campos básicos do perfil (validado via `api` smoke: `PATCH /companies/:id`). [x] UI de perfil carrega e permite editar (validado via build).
   - Feed (v1): empresa cria postagem; outra empresa vê no feed; curte e comenta.
   - Serviços (v1): empresa solicita serviço; prestadora envia proposta; solicitante aceita; após “concluído” ambos podem avaliar.
 - Regressões importantes:

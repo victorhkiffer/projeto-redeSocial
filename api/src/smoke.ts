@@ -4,6 +4,7 @@ import jwt from '@fastify/jwt'
 import authRoutes from './routes/auth'
 import meRoutes from './routes/me'
 import representativesRoutes from './routes/representatives'
+import companiesRoutes from './routes/companies'
 import { env } from './env'
 
 async function main() {
@@ -14,6 +15,7 @@ async function main() {
   await app.register(authRoutes)
   await app.register(meRoutes)
   await app.register(representativesRoutes)
+  await app.register(companiesRoutes)
 
   await app.listen({ host: '127.0.0.1', port: env.PORT })
 
@@ -47,6 +49,13 @@ async function main() {
   if (!meRes.ok) throw new Error(`me failed: ${meRes.status} ${await meRes.text()}`)
   const me = (await meRes.json()) as { company: { id: string } }
   const companyId = me.company.id
+
+  const patchCompany = await fetch(`${base}/companies/${companyId}`, {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ industry: 'Tecnologia', websiteUrl: 'https://example.com' })
+  })
+  if (!patchCompany.ok) throw new Error(`patch company failed: ${patchCompany.status} ${await patchCompany.text()}`)
 
   const memberEmail = `member+${Date.now()}@example.com`
   const memberPassword = 'password123'
