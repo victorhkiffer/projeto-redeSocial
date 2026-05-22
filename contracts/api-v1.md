@@ -38,13 +38,15 @@ Objetivo: alinhar entidades/fluxos antes da implementação. Campos finais podem
 
 ## Serviços
 - `GET /service-categories`
+- `POST /service-categories`
 - `POST /service-offerings`
 - `GET /service-offerings?companyId=...&categoryId=...`
 - `POST /service-requests`
-- `GET /service-requests`
+- `GET /service-requests?scope=mine|all`
 - `POST /service-requests/:id/proposals`
 - `POST /service-proposals/:id/accept`
 - `POST /service-proposals/:id/reject`
+- `GET /service-jobs`
 
 ## Avaliações
 - `POST /jobs/:id/reviews`

@@ -7,6 +7,7 @@ import representativesRoutes from './routes/representatives'
 import companiesRoutes from './routes/companies'
 import postsRoutes from './routes/posts'
 import followsRoutes from './routes/follows'
+import servicesRoutes from './routes/services'
 import { env } from './env'
 
 async function main() {
@@ -20,6 +21,7 @@ async function main() {
   await app.register(companiesRoutes)
   await app.register(postsRoutes)
   await app.register(followsRoutes)
+  await app.register(servicesRoutes)
 
   await app.listen({ host: '127.0.0.1', port: env.PORT })
 
@@ -161,6 +163,70 @@ async function main() {
     body: JSON.stringify({})
   })
   if (!unfollow.ok) throw new Error(`unfollow failed: ${unfollow.status} ${await unfollow.text()}`)
+
+  const createCategory = await fetch(`${base}/service-categories`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ name: `Categoria ${Date.now()}` })
+  })
+  if (!createCategory.ok) throw new Error(`create category failed: ${createCategory.status} ${await createCategory.text()}`)
+  const { id: categoryId } = (await createCategory.json()) as { id: string }
+
+  const offering = await fetch(`${base}/service-offerings`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ categoryId, title: 'Serviço X', description: 'Descrição', basePriceCents: 10000 })
+  })
+  if (!offering.ok) throw new Error(`create offering failed: ${offering.status} ${await offering.text()}`)
+
+  const request = await fetch(`${base}/service-requests`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ categoryId, title: 'Preciso de X', description: 'Detalhes' })
+  })
+  if (!request.ok) throw new Error(`create request failed: ${request.status} ${await request.text()}`)
+  const { id: requestId } = (await request.json()) as { id: string }
+
+  const otherLogin = await fetch(`${base}/auth/login`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email: otherEmail, password: otherPassword })
+  })
+  if (!otherLogin.ok) throw new Error(`other login failed: ${otherLogin.status} ${await otherLogin.text()}`)
+  const otherTokens = (await otherLogin.json()) as { accessToken: string }
+
+  const proposal = await fetch(`${base}/service-requests/${requestId}/proposals`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${otherTokens.accessToken}` },
+    body: JSON.stringify({ priceCents: 12000, message: 'Posso fazer' })
+  })
+  if (!proposal.ok) throw new Error(`create proposal failed: ${proposal.status} ${await proposal.text()}`)
+  const { id: proposalId } = (await proposal.json()) as { id: string }
+
+  const reject = await fetch(`${base}/service-proposals/${proposalId}/reject`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({})
+  })
+  if (!reject.ok) throw new Error(`reject proposal failed: ${reject.status} ${await reject.text()}`)
+
+  const proposal2 = await fetch(`${base}/service-requests/${requestId}/proposals`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${otherTokens.accessToken}` },
+    body: JSON.stringify({ priceCents: 11000, message: 'Posso fazer melhor' })
+  })
+  if (!proposal2.ok) throw new Error(`create proposal2 failed: ${proposal2.status} ${await proposal2.text()}`)
+  const { id: proposalId2 } = (await proposal2.json()) as { id: string }
+
+  const accept = await fetch(`${base}/service-proposals/${proposalId2}/accept`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({})
+  })
+  if (!accept.ok) throw new Error(`accept proposal failed: ${accept.status} ${await accept.text()}`)
+
+  const jobs = await fetch(`${base}/service-jobs?limit=5`, { headers: { authorization: `Bearer ${accessToken}` } })
+  if (!jobs.ok) throw new Error(`jobs list failed: ${jobs.status} ${await jobs.text()}`)
 
   const refresh = await fetch(`${base}/auth/refresh`, {
     method: 'POST',

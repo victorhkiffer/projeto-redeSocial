@@ -73,11 +73,11 @@ Estado operacional (atualize continuamente):
 - [x] Pesquisa de empresas (API + UI v1)
 
 #### Serviços
-- [ ] Cadastro de serviços
-- [ ] Solicitação de serviços
-- [ ] Aceitar proposta
-- [ ] Rejeitar proposta
-- [ ] Histórico de serviços
+- [x] Cadastro de serviços (API + UI v1: categorias + ofertas)
+- [x] Solicitação de serviços (API + UI v1)
+- [x] Aceitar proposta (API v1 + smoke)
+- [x] Rejeitar proposta (API v1 + smoke)
+- [x] Histórico de serviços (v1: listar jobs)
 - [ ] Controle de status do serviço
 
 #### Comunicação
@@ -222,6 +222,7 @@ Critérios de teste e aceite objetivos. Evite “como funciona”; foque em como
   - Empresa (v1): [x] editar campos básicos do perfil (validado via `api` smoke: `PATCH /companies/:id`). [x] UI de perfil carrega e permite editar (validado via build).
   - Feed (v1): [x] criar post (validado via `api` smoke). [x] curtir e comentar (validado via `api` smoke). [x] UI do feed build ok.
   - Follow/Search (v1): [x] buscar empresa por nome e seguir/deixar de seguir (validado via `api` smoke + UI build).
+  - Serviços (v1): [x] criar categoria/oferta, solicitar serviço, enviar proposta, rejeitar e aceitar proposta, e ver job (validado via `api` smoke + UI build). [ ] concluir/cancelar job e avaliações após concluir (pendente).
   - Feed (v1): empresa cria postagem; outra empresa vê no feed; curte e comenta.
   - Serviços (v1): empresa solicita serviço; prestadora envia proposta; solicitante aceita; após “concluído” ambos podem avaliar.
 - Regressões importantes:
@@ -259,6 +260,7 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Instalar deps: `cd api` + `C:\\Program Files\\nodejs\\npm.cmd install`
   - Build: `cd api` + `C:\\Program Files\\nodejs\\npm.cmd run build`
   - Smoke: `cd api` + `C:\\Program Files\\nodejs\\npm.cmd run smoke`
+  - Subir DB antes do smoke: `docker compose up -d db`
 - Comandos (frontend):
   - Instalar Node: `winget install --id OpenJS.NodeJS.LTS -e --source winget --accept-package-agreements --accept-source-agreements`
   - Scaffold: `C:\\Program Files\\nodejs\\npm.cmd create vite@latest frontend -- --template react-ts`
@@ -269,6 +271,7 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Build (após UI de representantes): `C:\\Program Files\\nodejs\\npm.cmd run build`
   - Build (após feed): `C:\\Program Files\\nodejs\\npm.cmd run build`
   - Build (após follow/search): `C:\\Program Files\\nodejs\\npm.cmd run build`
+  - Build (após serviços): `C:\\Program Files\\nodejs\\npm.cmd run build`
 - Exemplos:
   - `docker compose up -d db`
   - Aplicar migração: `psql -f db/migrations/0001_init.sql ...` (cliente/conn string a definir)
