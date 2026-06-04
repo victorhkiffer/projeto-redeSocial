@@ -292,6 +292,7 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Commit: `819270b` ("Add feed posts with likes and comments")
   - Commit: `3435357` ("Add company follow system and search")
   - Commit: `9371d53` ("Add services module (categories, requests, proposals, jobs)")
+  - Commit: `8ad9ce2` ("Add service job status and reviews flow")
 
 ## Interfaces and Dependencies
 Dependências, integrações e contratos (internos/externos). Não confundir com “comandos” nem com “backlog”.
