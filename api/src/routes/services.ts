@@ -34,6 +34,24 @@ const createProposalSchema = z.object({
   message: z.string().max(5000).optional().nullable()
 })
 
+async function findJobForCompany(jobId: string, companyId: string) {
+  const res = await pool.query<{
+    id: string
+    request_id: string
+    requester_company_id: string
+    provider_company_id: string
+    status: string
+  }>(
+    `
+    select id, request_id, requester_company_id, provider_company_id, status
+    from service_jobs
+    where id = $1 and (requester_company_id = $2 or provider_company_id = $2)
+    `,
+    [jobId, companyId]
+  )
+  return res.rows[0] ?? null
+}
+
 export default async function servicesRoutes(app: FastifyInstance) {
   app.get('/service-categories', { preHandler: requireAuth(app) }, async () => {
     const res = await pool.query<{ id: string; name: string }>('select id, name from service_categories order by name asc')
@@ -351,5 +369,86 @@ export default async function servicesRoutes(app: FastifyInstance) {
       }))
     }
   })
-}
 
+  app.post('/service-jobs/:id/start', { preHandler: requireAuth(app) }, async (req: any, reply) => {
+    const user = req.authUser!
+    const jobId = String(req.params.id)
+    const job = await findJobForCompany(jobId, user.companyId)
+    if (!job) return reply.code(404).send({ message: 'Job not found' })
+    if (job.provider_company_id !== user.companyId) return reply.code(403).send({ message: 'Only provider can start' })
+    if (job.status !== 'ACCEPTED') return reply.code(400).send({ message: 'Job cannot be started' })
+
+    const client = await pool.connect()
+    try {
+      await client.query('begin')
+      await client.query(
+        "update service_jobs set status = 'IN_PROGRESS', started_at = now(), updated_at = now() where id = $1",
+        [jobId]
+      )
+      await client.query("update service_requests set status = 'IN_PROGRESS', updated_at = now() where id = $1", [
+        job.request_id
+      ])
+      await client.query('commit')
+      return { ok: true }
+    } catch (err) {
+      await client.query('rollback')
+      throw err
+    } finally {
+      client.release()
+    }
+  })
+
+  app.post('/service-jobs/:id/complete', { preHandler: requireAuth(app) }, async (req: any, reply) => {
+    const user = req.authUser!
+    const jobId = String(req.params.id)
+    const job = await findJobForCompany(jobId, user.companyId)
+    if (!job) return reply.code(404).send({ message: 'Job not found' })
+    if (job.requester_company_id !== user.companyId) return reply.code(403).send({ message: 'Only requester can complete' })
+    if (job.status !== 'IN_PROGRESS') return reply.code(400).send({ message: 'Job cannot be completed' })
+
+    const client = await pool.connect()
+    try {
+      await client.query('begin')
+      await client.query(
+        "update service_jobs set status = 'COMPLETED', completed_at = now(), updated_at = now() where id = $1",
+        [jobId]
+      )
+      await client.query("update service_requests set status = 'COMPLETED', updated_at = now() where id = $1", [
+        job.request_id
+      ])
+      await client.query('commit')
+      return { ok: true }
+    } catch (err) {
+      await client.query('rollback')
+      throw err
+    } finally {
+      client.release()
+    }
+  })
+
+  app.post('/service-jobs/:id/cancel', { preHandler: requireAuth(app) }, async (req: any, reply) => {
+    const user = req.authUser!
+    const jobId = String(req.params.id)
+    const job = await findJobForCompany(jobId, user.companyId)
+    if (!job) return reply.code(404).send({ message: 'Job not found' })
+    if (job.status === 'COMPLETED' || job.status === 'CANCELED') {
+      return reply.code(400).send({ message: 'Job cannot be canceled' })
+    }
+
+    const client = await pool.connect()
+    try {
+      await client.query('begin')
+      await client.query("update service_jobs set status = 'CANCELED', updated_at = now() where id = $1", [jobId])
+      await client.query("update service_requests set status = 'CANCELED', updated_at = now() where id = $1", [
+        job.request_id
+      ])
+      await client.query('commit')
+      return { ok: true }
+    } catch (err) {
+      await client.query('rollback')
+      throw err
+    } finally {
+      client.release()
+    }
+  })
+}

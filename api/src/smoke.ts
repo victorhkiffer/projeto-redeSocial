@@ -8,6 +8,7 @@ import companiesRoutes from './routes/companies'
 import postsRoutes from './routes/posts'
 import followsRoutes from './routes/follows'
 import servicesRoutes from './routes/services'
+import reviewsRoutes from './routes/reviews'
 import { env } from './env'
 
 async function main() {
@@ -22,6 +23,7 @@ async function main() {
   await app.register(postsRoutes)
   await app.register(followsRoutes)
   await app.register(servicesRoutes)
+  await app.register(reviewsRoutes)
 
   await app.listen({ host: '127.0.0.1', port: env.PORT })
 
@@ -224,9 +226,42 @@ async function main() {
     body: JSON.stringify({})
   })
   if (!accept.ok) throw new Error(`accept proposal failed: ${accept.status} ${await accept.text()}`)
+  const { jobId } = (await accept.json()) as { jobId: string }
+  if (!jobId) throw new Error('accept did not return jobId')
 
   const jobs = await fetch(`${base}/service-jobs?limit=5`, { headers: { authorization: `Bearer ${accessToken}` } })
   if (!jobs.ok) throw new Error(`jobs list failed: ${jobs.status} ${await jobs.text()}`)
+
+  const startJob = await fetch(`${base}/service-jobs/${jobId}/start`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${otherTokens.accessToken}` },
+    body: JSON.stringify({})
+  })
+  if (!startJob.ok) throw new Error(`start job failed: ${startJob.status} ${await startJob.text()}`)
+
+  const completeJob = await fetch(`${base}/service-jobs/${jobId}/complete`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({})
+  })
+  if (!completeJob.ok) throw new Error(`complete job failed: ${completeJob.status} ${await completeJob.text()}`)
+
+  const review = await fetch(`${base}/jobs/${jobId}/reviews`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ reviewedCompanyId: otherCompany.id, stars: 5, comment: 'Excelente' })
+  })
+  if (!review.ok) throw new Error(`review failed: ${review.status} ${await review.text()}`)
+
+  const reviews = await fetch(`${base}/companies/${otherCompany.id}/reviews`, {
+    headers: { authorization: `Bearer ${accessToken}` }
+  })
+  if (!reviews.ok) throw new Error(`company reviews failed: ${reviews.status} ${await reviews.text()}`)
+
+  const ranking = await fetch(`${base}/ranking/categories/${categoryId}`, {
+    headers: { authorization: `Bearer ${accessToken}` }
+  })
+  if (!ranking.ok) throw new Error(`ranking failed: ${ranking.status} ${await ranking.text()}`)
 
   const refresh = await fetch(`${base}/auth/refresh`, {
     method: 'POST',

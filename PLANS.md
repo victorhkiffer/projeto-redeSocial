@@ -78,7 +78,7 @@ Estado operacional (atualize continuamente):
 - [x] Aceitar proposta (API v1 + smoke)
 - [x] Rejeitar proposta (API v1 + smoke)
 - [x] Histórico de serviços (v1: listar jobs)
-- [ ] Controle de status do serviço
+- [x] Controle de status do serviço (API + UI v1: start/complete/cancel)
 
 #### Comunicação
 - [ ] Chat entre empresas
@@ -87,11 +87,11 @@ Estado operacional (atualize continuamente):
 - [ ] Compartilhamento de arquivos
 
 #### Reputação
-- [ ] Sistema de avaliações
-- [ ] Avaliação por estrelas
-- [ ] Comentários de avaliação
-- [ ] Média geral das empresas
-- [ ] Ranking por categoria
+- [x] Sistema de avaliações (API + UI v1 para jobs concluídos)
+- [x] Avaliação por estrelas (API + UI v1)
+- [x] Comentários de avaliação (API + UI v1)
+- [x] Média geral das empresas (API + UI v1)
+- [x] Ranking por categoria (API v1 + smoke)
 
 #### Dashboard
 - [ ] Estatísticas da empresa
@@ -106,6 +106,7 @@ Estado operacional (atualize continuamente):
 - 2026-05-21: Resolução Docker: iniciar `Docker Desktop.exe` habilitou o daemon (`docker info` ok) e permitiu subir o Postgres via compose.
 - 2026-05-21: Resolução Node: instalado via `winget`. Em PowerShell, `npm` pode cair no `npm.ps1` (bloqueado por policy); usar `C:\\Program Files\\nodejs\\npm.cmd` (ou ajustar policy) evita o erro.
 - 2026-05-21: `winget search` sem `--source winget` tentou usar `msstore` e pediu aceite interativo; usar `--source winget` evita prompt (não-interativo).
+- 2026-06-04: O Docker daemon não estava ativo no início da validação (`docker compose up -d db` falhou com pipe `dockerDesktopLinuxEngine` ausente); iniciar o Docker Desktop resolveu e o smoke passou.
 
 ## Decision Log
 - 2026-05-21: Banco de dados alvo: PostgreSQL (modelagem v1 em SQL). Chaves primárias `uuid`, timestamps `timestamptz`.
@@ -114,6 +115,8 @@ Estado operacional (atualize continuamente):
 - 2026-05-21: Frontend v1: Vite + React + TypeScript, rotas com React Router e UI base com Tailwind (darkMode por classe).
 - 2026-05-21: Backend v1: Fastify + TypeScript + `pg` (SQL direto), Auth com JWT access token + refresh token opaco persistido em `auth_sessions`.
 - 2026-05-21: Frontend Auth v1: tokens em `localStorage` + refresh automático no bootstrap; rotas `/app/*` protegidas por guard.
+- 2026-06-04: Status de job v1: prestador inicia (`IN_PROGRESS`), solicitante conclui (`COMPLETED`) e qualquer parte do job pode cancelar antes de concluir.
+- 2026-06-04: Avaliações v1 só podem ser criadas em jobs `COMPLETED`; a empresa avaliada deve ser a contraparte do job.
 
 ## Outcomes & Retrospective
 Nada registrado.
@@ -222,7 +225,8 @@ Critérios de teste e aceite objetivos. Evite “como funciona”; foque em como
   - Empresa (v1): [x] editar campos básicos do perfil (validado via `api` smoke: `PATCH /companies/:id`). [x] UI de perfil carrega e permite editar (validado via build).
   - Feed (v1): [x] criar post (validado via `api` smoke). [x] curtir e comentar (validado via `api` smoke). [x] UI do feed build ok.
   - Follow/Search (v1): [x] buscar empresa por nome e seguir/deixar de seguir (validado via `api` smoke + UI build).
-  - Serviços (v1): [x] criar categoria/oferta, solicitar serviço, enviar proposta, rejeitar e aceitar proposta, e ver job (validado via `api` smoke + UI build). [ ] concluir/cancelar job e avaliações após concluir (pendente).
+  - Serviços (v1): [x] criar categoria/oferta, solicitar serviço, enviar proposta, rejeitar e aceitar proposta, ver job, iniciar/concluir/cancelar job (validado via `api` smoke + UI build).
+  - Reputação (v1): [x] avaliar job concluído com estrelas/comentário, consultar média geral da empresa e ranking por categoria (validado via `api` smoke + UI build para tela de avaliações).
   - Feed (v1): empresa cria postagem; outra empresa vê no feed; curte e comenta.
   - Serviços (v1): empresa solicita serviço; prestadora envia proposta; solicitante aceita; após “concluído” ambos podem avaliar.
 - Regressões importantes:
@@ -261,6 +265,8 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Build: `cd api` + `C:\\Program Files\\nodejs\\npm.cmd run build`
   - Smoke: `cd api` + `C:\\Program Files\\nodejs\\npm.cmd run smoke`
   - Subir DB antes do smoke: `docker compose up -d db`
+  - Build (após status/reviews): `cd api` + `C:\\Program Files\\nodejs\\npm.cmd run build`
+  - Smoke (após status/reviews): `cd api` + `C:\\Program Files\\nodejs\\npm.cmd run smoke`
 - Comandos (frontend):
   - Instalar Node: `winget install --id OpenJS.NodeJS.LTS -e --source winget --accept-package-agreements --accept-source-agreements`
   - Scaffold: `C:\\Program Files\\nodejs\\npm.cmd create vite@latest frontend -- --template react-ts`
@@ -272,6 +278,7 @@ Logs, exemplos e notas úteis (cole aqui trechos curtos, links internos, outputs
   - Build (após feed): `C:\\Program Files\\nodejs\\npm.cmd run build`
   - Build (após follow/search): `C:\\Program Files\\nodejs\\npm.cmd run build`
   - Build (após serviços): `C:\\Program Files\\nodejs\\npm.cmd run build`
+  - Build (após status/reviews): `C:\\Program Files\\nodejs\\npm.cmd run build`
 - Exemplos:
   - `docker compose up -d db`
   - Aplicar migração: `psql -f db/migrations/0001_init.sql ...` (cliente/conn string a definir)

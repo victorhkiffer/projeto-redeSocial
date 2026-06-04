@@ -47,7 +47,11 @@ Objetivo: alinhar entidades/fluxos antes da implementação. Campos finais podem
 - `POST /service-proposals/:id/accept`
 - `POST /service-proposals/:id/reject`
 - `GET /service-jobs`
+- `POST /service-jobs/:id/start`
+- `POST /service-jobs/:id/complete`
+- `POST /service-jobs/:id/cancel`
 
 ## Avaliações
 - `POST /jobs/:id/reviews`
 - `GET /companies/:id/reviews`
+- `GET /ranking/categories/:id`

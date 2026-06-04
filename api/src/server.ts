@@ -10,6 +10,7 @@ import companiesRoutes from './routes/companies'
 import postsRoutes from './routes/posts'
 import followsRoutes from './routes/follows'
 import servicesRoutes from './routes/services'
+import reviewsRoutes from './routes/reviews'
 
 const app = Fastify({ logger: true })
 
@@ -34,6 +35,7 @@ await app.register(companiesRoutes)
 await app.register(postsRoutes)
 await app.register(followsRoutes)
 await app.register(servicesRoutes)
+await app.register(reviewsRoutes)
 
 const address = await app.listen({ host: '0.0.0.0', port: env.PORT })
 app.log.info({ address }, 'server listening')

@@ -146,6 +146,20 @@ export default function Services() {
     }
   }
 
+  async function changeJobStatus(jobId: string, action: 'start' | 'complete' | 'cancel') {
+    setError(null)
+    try {
+      await apiFetch(`/service-jobs/${jobId}/${action}`, {
+        method: 'POST',
+        token,
+        body: JSON.stringify({})
+      })
+      await loadAll()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Falha ao alterar status')
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -335,6 +349,29 @@ export default function Services() {
                 <div className="font-medium">{j.status}</div>
                 <div className="text-xs text-[color:var(--muted)]">
                   {j.requesterCompany.name} → {j.providerCompany.name}
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => changeJobStatus(j.id, 'start')}
+                    className="rounded-lg border border-[color:var(--border)] px-3 py-2 text-xs hover:border-[color:var(--primary)]"
+                  >
+                    Iniciar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => changeJobStatus(j.id, 'complete')}
+                    className="rounded-lg border border-[color:var(--border)] px-3 py-2 text-xs hover:border-[color:var(--primary)]"
+                  >
+                    Concluir
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => changeJobStatus(j.id, 'cancel')}
+                    className="rounded-lg border border-[color:var(--border)] px-3 py-2 text-xs hover:border-[color:var(--primary)]"
+                  >
+                    Cancelar
+                  </button>
                 </div>
               </div>
             ))
